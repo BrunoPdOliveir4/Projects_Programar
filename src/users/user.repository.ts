@@ -26,6 +26,10 @@ export class UserRepository {
     return await this.repo.findOne({ where: { email } });
   }
 
+  async getUserTasks(id: number): Promise<User | null> {
+    return await this.repo.findOne({ where: { id }, relations: ['tasks'] });
+  }
+
   async create(user: User): Promise<User> {
     return await this.repo.save(user);
   }

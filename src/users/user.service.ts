@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -20,6 +21,12 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    return user;
+  }
+
+  async getUserTasks(id: number): Promise<User> {
+    const user = await this.userRepository.getUserTasks(id);
+    if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
@@ -46,7 +53,7 @@ export class UserService {
     if (!user.password) throw new BadRequestException('Password is required');
 
     user.created_at = new Date();
-
+    user.password = await bcrypt.hash(user.password, 10);
     return this.userRepository.create(user);
   }
 
@@ -64,7 +71,7 @@ export class UserService {
 
   private emailValidation(email: string): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)) throw new BadRequestException('Invalid email');
+    if (!emailRegex.test(email)) throw new BadRequestException('Invalid email');
   }
 }
 

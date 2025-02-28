@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Task } from 'src/tasks/task.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class User {
@@ -8,15 +9,18 @@ export class User {
   @Column({ length: 500 })
   username: string;
 
-  @Column('text')
+  @Column({ length: 500 })
   email: string;
 
   @Column()
   password: string;
 
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Task[];
+
   @Column()
   created_at: Date;
 
-  @Column()
+  @Column({ nullable: true })
   updated_at: Date;
 }
