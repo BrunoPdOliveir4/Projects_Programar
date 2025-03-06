@@ -4,15 +4,14 @@ import TaskTable from "../../../components/TaskTable";
 import TaskEditModal from "../../../components/TaskEditModal";
 import TaskDeleteModal from "../../../components/TaskDeleteModal";
 import TaskCreateModal from "../../../components/TaskCreateModal";
-import { CustomAlert } from "../../../components/Alert";
+import { CustomAlert, ThemeToggle } from "../../../components";
 import TaskService from "../../../services/TaskService";
 import TaskType from "../../../types/TaskType";
 import AddIcon from '@mui/icons-material/Add';
 import "./styles.css";
-import UserType from "../../../types/UserType";
 
 const HomeScreen = () => {
-  const [tasks, setTasks] = useState<UserType[]>([]);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [editTask, setEditTask] = useState<TaskType | null>(null);
   const [deleteTask, setDeleteTask] = useState<TaskType | null>(null);
   const [alert, setAlert] = useState({
@@ -79,13 +78,16 @@ const HomeScreen = () => {
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <h1>Your tasks</h1>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              New Task
-            </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setIsCreateModalOpen(true)}
+              >
+                New Task
+              </Button>
+              <ThemeToggle isAbsolute={false} />
+            </div>
           </Box>
           <TaskTable
             tasks={tasks}

@@ -3,7 +3,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserService from "../../../services/UserService";
-import { CustomAlert } from "../../../components/Alert";
+import { CustomAlert, ThemeToggle } from "../../../components";
 import './styles.css';
 
 const RegisterScreen = () => {
@@ -120,6 +120,7 @@ const RegisterScreen = () => {
         severity={alert.severity}
         onClose={handleCloseAlert}
       />
+      <ThemeToggle isAbsolute/>
     </div>
   );
 };
