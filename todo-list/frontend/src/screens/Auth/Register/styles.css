@@ -1,0 +1,39 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 4rem);
+
+  .register-card {
+    border-radius: 2rem;
+    padding: 2rem;
+  }
+
+  .register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .register-title {
+    text-align: center;
+  }
+
+  .register-subtitle {
+    text-align: center;
+  }
+
+  .login-link {
+    text-align: center;
+  }
+
+  .login-link-span {
+    font-weight: bold;
+    text-decoration: none;
+
+    &:visited {
+      color: inherit;
+    }
+  }
+}
