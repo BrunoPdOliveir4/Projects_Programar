@@ -9,16 +9,24 @@ import {
   UseGuards,
   Put,
   Patch,
+  Delete,
+  BadRequestException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { AuthGuard } from 'src/infrastructure/auth/auth.guard';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { ApiCreatedResponse } from '@nestjs/swagger';
 
 @Controller('tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: CreateTaskDto,
+  })
   @Post()
   @UseGuards(AuthGuard)
   create(
@@ -30,11 +38,6 @@ export class TaskController {
     return this.taskService.createTask(createTaskDto, token);
   }
 
-  @Get()
-  findAll() {
-    return this.taskService.getAllTasks();
-  }
-
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.taskService.getTaskById(id);
@@ -43,10 +46,12 @@ export class TaskController {
   @Put(':id')
   @UseGuards(AuthGuard)
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
     @Headers('authorization') authorization: string,
   ) {
+    if (!id || id === undefined)
+      throw new BadRequestException('The ID must be informed on path');
     const token = authorization?.replace('Bearer ', '') || null;
     if (!token) throw new NotFoundException('Token not found');
     return this.taskService.updateTask(id, updateTaskDto, token);
@@ -64,8 +69,14 @@ export class TaskController {
     return this.taskService.updateTaskStatus(id, status, token);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.taskService.remove(id);
-  // }
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  archiveTasks(
+    @Param('id') id: number,
+    @Headers('authorization') authorization: string,
+  ) {
+    const token = authorization?.replace('Bearer ', '') || null;
+    if (!token) throw new NotFoundException('Token not found');
+    return this.taskService.archiveTask(id, token);
+  }
 }

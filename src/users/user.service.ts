@@ -3,14 +3,47 @@ import {
   BadRequestException,
   NotFoundException,
   ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from 'src/dto/register.dto';
+import { JwtService } from '@nestjs/jwt';
+import { token } from 'src/infrastructure/auth/auth.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private jwtService: JwtService,
+  ) {}
+
+  async decryptToken(token: string): Promise<token> {
+    try {
+      return await this.jwtService.verifyAsync(token);
+    } catch (error) {
+      throw new UnauthorizedException(`Invalid token: ${error}`);
+    }
+  }
+
+  async getUserByToken(token: string): Promise<User> {
+    const decoded: token = await this.decryptToken(token);
+    const user = await this.findByUsername(decoded.username);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async getMyTasks(token: string): Promise<User> {
+    const user: User = await this.getUserByToken(token);
+    const userTasks: User | null = await this.userRepository.getUserTasks(
+      user.id,
+    );
+    if (!userTasks) throw new NotFoundException('Tasks not found for user');
+    return userTasks;
+  }
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.findAll();
@@ -46,15 +79,18 @@ export class UserService {
     return user;
   }
 
-  async create(user: User): Promise<User> {
+  async create(user: RegisterDto): Promise<User> {
     this.emailValidation(user.email);
     if (await this.userRepository.findOneByEmail(user.email))
       throw new ConflictException('Email already in use');
     if (!user.password) throw new BadRequestException('Password is required');
-
-    user.created_at = new Date();
-    user.password = await bcrypt.hash(user.password, 10);
-    return this.userRepository.create(user);
+    const newUser: User = new User();
+    newUser.username = user.username;
+    newUser.email = user.email;
+    newUser.password = user.password;
+    newUser.created_at = new Date();
+    newUser.password = await bcrypt.hash(newUser.password, 10);
+    return this.userRepository.create(newUser);
   }
 
   async update(id: number, updatedUser: Partial<User>): Promise<User> {

@@ -1,5 +1,13 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDto } from 'src/dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -7,7 +15,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
+  signIn(@Body() signInDto: LoginDto) {
+    if (!signInDto.username) throw new BadRequestException('User not sended');
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 }

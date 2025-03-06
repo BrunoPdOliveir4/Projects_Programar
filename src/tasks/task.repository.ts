@@ -18,6 +18,10 @@ export class TaskRepository {
     return await this.repo.findOne({ where: { id } });
   }
 
+  async findOneToEdit(id: number): Promise<Task | null> {
+    return await this.repo.findOne({ where: { id }, relations: ['user'] });
+  }
+
   async findTaskOwner(id: number): Promise<number | null> {
     const task = await this.repo.findOne({
       where: { id },

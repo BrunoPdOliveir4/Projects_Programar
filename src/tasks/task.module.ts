@@ -12,7 +12,8 @@ import { TaskService } from 'src/tasks/task.service';
     TypeOrmModule.forFeature([Task]),
     AuthModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'Programar com você!',
+      secret: process.env.JWT_SECRET || 'Programar com você!', // Use env variable for security
+      signOptions: { expiresIn: '1h' }, // Token expiry time
     }),
   ],
   providers: [TaskService, TaskRepository],

@@ -50,7 +50,8 @@ export class TaskService {
     token: string,
   ): Promise<Task> {
     const user: User = await this.authService.getUserByToken(token);
-    const task = await this.getTaskById(id);
+    const task: Task | null = await this.taskRepository.findOneToEdit(id);
+    if (!task) throw new NotFoundException('Task not founded');
     if (task.user.id !== user.id) {
       throw new UnauthorizedException('You are not the owner of this task');
     }
@@ -64,9 +65,14 @@ export class TaskService {
     if (updateTaskDto.priority) {
       task.priority = updateTaskDto.priority;
     }
+    if (updateTaskDto.status) {
+      task.status = updateTaskDto.status;
+    }
+
     task.updated_at = new Date();
-    await this.taskRepository.update(id, task);
-    return task;
+    const newTask: Task | null = await this.taskRepository.update(id, task);
+    if (!newTask) throw new BadRequestException('Something went wrong');
+    return newTask;
   }
 
   async updateTaskStatus(
@@ -93,5 +99,24 @@ export class TaskService {
     task.updated_at = new Date();
     await this.taskRepository.update(id, task);
     return task;
+  }
+
+  async archiveTask(id: number, token: string): Promise<any> {
+    const user: User = await this.authService.getUserByToken(token);
+    const taskOwner: number | null =
+      await this.taskRepository.findTaskOwner(id);
+
+    if (!taskOwner) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+    if (taskOwner !== user.id) {
+      throw new UnauthorizedException('You are not the owner of this task');
+    }
+
+    const task = await this.getTaskById(id);
+    task.status = 'archived';
+    task.updated_at = new Date();
+    await this.taskRepository.update(id, task);
+    return { statusCode: 200, message: 'Your task was archived successfully' };
   }
 }
