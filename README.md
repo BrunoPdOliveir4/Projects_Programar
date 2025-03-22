@@ -6,6 +6,7 @@ This repository contains all projects developed during the Programar.com.vc ment
 
 - [Projects](#projects)
   - [1. Todo List](#1-todo-list)
+  - [2. Tic Tac Toe](#2-Jogo-da-Velha)
 - [Getting Started](#getting-started)
 - [Contact](#contact)
 
