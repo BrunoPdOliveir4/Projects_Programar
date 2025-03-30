@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import Board from '@/components/game/Board.vue';
 
 </script>
 
 <template>
-  <RouterView/>
+  <Board/>
 </template>
 
 <style scoped>
