@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 
-const props = defineProps({
+defineProps({
   isActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   isCircle: {
     type: Boolean,
@@ -12,38 +11,33 @@ const props = defineProps({
   },
 });
 
-const circleClass = computed(() => ({
-  circle: true,
-  remove: !props.isActive
-}));
-
-const crossClass = computed(() => ({
-  cross: true,
-  remove: !props.isActive
-}));
 </script>
 
 <template>
   <div class="mark" v-if="isCircle">
-    <svg viewBox="0 0 100 100" class="circle-container">
-      <circle :class="circleClass"/>
+    <svg viewBox="0 0 100 100" :class="['circle-container', {'remove': !isActive }]">
+      <circle class="circle"/>
     </svg>
   </div>
 
   <div class="mark" v-else>
-    <svg viewBox="0 0 100 100" class="cross-container">
-      <line :class="crossClass" x1="20" y1="20" x2="80" y2="80"/>
-      <line :class="[crossClass, 'cross-delay']" x1="80" y1="20" x2="20" y2="80"/>
+    <svg viewBox="0 0 100 100" :class="['cross-container', {'remove': !isActive }]">
+      <line class="cross" x1="20" y1="20" x2="80" y2="80"/>
+      <line class="cross cross-delay" x1="80" y1="20" x2="20" y2="80"/>
     </svg>
   </div>
 </template>
 
 <style scoped>
 .mark {
-  height: 5rem;
+  height: 5.5rem;
   aspect-ratio: 1;
   stroke: aqua;
   stroke-width: 15;
+
+  .circle-container, .cross-container {
+    stroke-dashoffset: 253;
+  }
 
   .circle-container {
     transform: rotate(-90deg);
@@ -57,12 +51,12 @@ const crossClass = computed(() => ({
 
       /* Animation */
       stroke-dasharray: 253;
-      stroke-dashoffset: 253;
-      animation: drawCircle 0.5s forwards;
+      stroke-dashoffset: 0;
+      transition: .6s;
+    }
 
-      &.remove {
-        animation: drawCircle 0.5s forwards reverse;
-      }
+    &.remove .circle {
+      stroke-dashoffset: 253;
     }
   }
 
@@ -71,42 +65,17 @@ const crossClass = computed(() => ({
     .cross {
       fill: none;
       stroke-dasharray: 90;
-      stroke-dashoffset: 90;
-      animation: drawLine 0.3s forwards;
+      stroke-dashoffset: 0;
+      transition: .3s;
 
       &.cross-delay {
-        animation-delay: 0.3s;
-      }
-
-      &.remove {
-        animation: drawLine 0.3s forwards reverse;
-
-        &.cross-delay {
-          animation: removeLineDelayed 0.6s forwards;
-        }
+        transition-delay: 0.3s;
       }
     }
-  }
-}
-
-@keyframes drawCircle {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes drawLine {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes removeLineDelayed {
-  0%, 50% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: 90;
+    
+    &.remove .cross {
+      stroke-dashoffset: 90;
+    }
   }
 }
 </style>
