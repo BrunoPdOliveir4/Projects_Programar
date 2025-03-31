@@ -20,14 +20,9 @@ defineProps({
   height: 5px;
   background-color: red;
   z-index: 1;
-  transition: .6s;
-
-  &:has([class*="*"]) {
-    width: 100%;
-  }
+  transition: width .6s;
 
   &.row-top {
-    width: 100%;
     width: 100%;
     top: 15%;
   }
@@ -54,7 +49,7 @@ defineProps({
 
   &.column-right {
     width: 100%;
-    right: 35%;
+    right: -35%;
     rotate: 90deg;
   }
 
